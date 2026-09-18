@@ -1,0 +1,23 @@
+{
+  "name": "artigo-cancelamento-nodejs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Exemplos de cancelamento em Node.js do artigo sobre AbortSignal, CancellationToken e context.Context",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "01": "node src/01-timeout.ts",
+    "02": "node src/02-propagacao.ts",
+    "03": "node src/03-avisos.ts",
+    "04": "node src/04-cascata.ts",
+    "05": "node src/05-espera-sem-saida.ts",
+    "mock": "node ../mock-server/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.3",
+    "typescript": "^5.9.0"
+  }
+}

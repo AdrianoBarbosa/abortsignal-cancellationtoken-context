@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.22", "stable"]
+    defaults:
+      run:
+        working-directory: go
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: false
+      - run: test -z "$(gofmt -l .)"
+      - run: go vet ./...
+      - run: go build ./...
+      - name: Roda os exemplos contra o servidor de apoio
+        run: |
+          go run ./cmd/00-mock-server &
+          for i in $(seq 1 100); do curl -sf localhost:8080/ > /dev/null && break; sleep 0.2; done
+          for p in 01-timeout 02-propagacao 03-avisos 04-cascata 05-goroutine-leak; do
+            go run -race ./cmd/$p
+          done
+
+  nodejs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["22.18", "24"]
+    defaults:
+      run:
+        working-directory: nodejs
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: nodejs/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Roda os exemplos contra o servidor de apoio
+        run: |
+          node ../mock-server/server.js &
+          for i in $(seq 1 100); do curl -sf localhost:8080/ > /dev/null && break; sleep 0.2; done
+          for n in 01 02 03 04 05; do
+            npm run -s $n
+          done
+
+  dotnet:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-major: ["8", "10"]
+    defaults:
+      run:
+        working-directory: dotnet
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ matrix.dotnet-major }}.0.x
+      # The runner may have newer SDKs preinstalled; pin the one from the matrix.
+      - name: Fixa o SDK da matriz
+        run: |
+          sdk=$(dotnet --list-sdks | awk '{print $1}' | grep "^${{ matrix.dotnet-major }}\." | tail -1)
+          test -n "$sdk"
+          dotnet new globaljson --sdk-version "$sdk" --force
+          dotnet --version
+      - run: dotnet build Cancelamento -warnaserror
+      - name: Roda os exemplos contra o servidor de apoio
+        run: |
+          node ../mock-server/server.js &
+          for i in $(seq 1 100); do curl -sf localhost:8080/ > /dev/null && break; sleep 0.2; done
+          for n in 01 02 03 04 05; do
+            dotnet run --no-build --project Cancelamento -- $n
+          done

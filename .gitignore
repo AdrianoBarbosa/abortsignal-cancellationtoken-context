@@ -1,0 +1,19 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# .NET
+bin/
+obj/
+*.user
+
+# Go
+/go/bin/
+
+# Rascunho do artigo: publicado no LinkedIn, fora do repositorio
+artigo-context-vs-cancellationtoken.md
+
+# Editores
+.vscode/
+.idea/
+.DS_Store
