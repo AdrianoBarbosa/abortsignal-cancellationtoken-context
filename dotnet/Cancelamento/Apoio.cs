@@ -11,7 +11,7 @@ public static class Apoio
     /// <c>node mock-server/server.js</c> or <c>go run ./cmd/00-mock-server</c>.
     /// </summary>
     public static string BaseUrl =>
-        Environment.GetEnvironmentVariable("BASE_URL") ?? "http://localhost:8080";
+        (Environment.GetEnvironmentVariable("BASE_URL") ?? "http://localhost:8080").TrimEnd('/');
 
     /// <summary>
     /// One HttpClient for the whole process. In a real application use

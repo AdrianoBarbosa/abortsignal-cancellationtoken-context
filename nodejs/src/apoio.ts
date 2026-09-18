@@ -5,7 +5,7 @@
 //   node mock-server/server.js
 //   (or npm run mock, from inside nodejs/)
 
-export const BASE_URL = process.env.BASE_URL ?? "http://localhost:8080";
+export const BASE_URL = (process.env.BASE_URL ?? "http://localhost:8080").replace(/\/+$/, "");
 
 // Stops the example with a clear message when the support server is not
 // running, instead of a raw "fetch failed". It also catches another program

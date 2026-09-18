@@ -50,7 +50,7 @@ public static class Avisos
 
         // A legacy task: it only knows how to be disposed, it takes no token.
         var ticks = 0;
-        var legado = new Timer(
+        using var legado = new Timer(
             _ => Console.WriteLine($"  tarefa legada: tick {Interlocked.Increment(ref ticks)}"),
             null,
             dueTime: 100,

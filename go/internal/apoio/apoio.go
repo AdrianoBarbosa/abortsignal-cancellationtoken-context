@@ -18,7 +18,7 @@ import (
 //	node mock-server/server.js
 func BaseURL() string {
 	if v := os.Getenv("BASE_URL"); v != "" {
-		return v
+		return strings.TrimRight(v, "/")
 	}
 	return "http://localhost:8080"
 }
